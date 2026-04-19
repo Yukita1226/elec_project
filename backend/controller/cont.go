@@ -14,14 +14,31 @@ var	ev  = entity.Evstation{}
 var car = entity.Car{}
 
 
-func makenum()
-{
+func Makenum(){
+	solar.Ptotal = rand.Float64()* 100
 
+	ev.Ptotal = rand.Float64()* 100
+	ev.Ptransfer = rand.Float64()* 100
+
+	car.Ptotal = rand.Float64()* 100
+	car.Ptransfer = rand.Float64()* 100
 
 }
+
 func Getsolar(c * gin.Context){
 
-	test = 
-	c.JSON(http.StatusOK);
-	
+	c.JSON(http.StatusOK,solar);
 }
+
+func Getcar(c * gin.Context){
+
+	c.JSON(http.StatusOK,car);
+}
+
+func Getev(c * gin.Context){
+
+	c.JSON(http.StatusOK,ev);
+}
+
+
+

@@ -1,9 +1,10 @@
 package main
 
 import (
-	"net/http"
-	"sync"
+	//"sync"
 	"time"
+
+	"ev/controller"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,12 +13,23 @@ import (
 func main(){
 
 	r := gin.Default()
+	//var mu sync.Mutex
 
-	r.Use(func(c * gin.Context){
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
-		c.Next()
-	})
+	r.GET("/Getsolar",controller.Getsolar)
+	r.GET("/Getcar",controller.Getcar)
+	r.GET("/Getev",controller.Getev)
+
+	controller.Makenum()
+	go func() {
+		for {
+			controller.Makenum()
+			time.Sleep(5 * time.Second)
+		}
+	}()
+	r.Run(":8080")
+	
 }
+
+
+
