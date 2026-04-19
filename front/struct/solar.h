@@ -2,6 +2,6 @@
 
 struct Solar
 {
-    double Ptotal;
+    double Ptotal    = 0.0;
 };
 

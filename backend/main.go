@@ -31,5 +31,6 @@ func main(){
 	
 }
 
+//http://localhost:8080/Getsolar
 
 
