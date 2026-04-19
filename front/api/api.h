@@ -2,7 +2,7 @@
 
 class Recivedata {
 public:
-    void getSolar();
-    void getCar();
-    void getEv();
+    double getSolar();
+    double getCar();
+    double getEv();
 };
