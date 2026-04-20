@@ -12,4 +12,4 @@ int main() {
     return 0;
 }
 
-//g++ main.cpp api/*.cpp -o app.exe
+//g++ main.cpp api/*.cpp -I. -o app.exe -lcurl

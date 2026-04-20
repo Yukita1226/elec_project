@@ -1,8 +1,10 @@
 #include <curl/curl.h>
 #include "json.hpp"
 #include "api.h"
+#include "../struct/solar.h"
 
 using js = nlohmann::json;
+Solar s;
 
 size_t Wcallb(void* contents, size_t size, size_t nmemb, std::string* s) {
     s->append((char*)contents, size * nmemb);
@@ -26,7 +28,9 @@ Solar Recivedata::getSolar() {
     }
 
     js j = js::parse(res);
+    s.Ptotal = j["Ptotal"].get<double>();
 
-    return j["Ptotal"];
+    return s;
+    
 
 }
