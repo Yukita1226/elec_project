@@ -2,6 +2,7 @@ package entity
 
 type Solar struct {
 
-	Ptotal float64
+	Ptotal 		float64
+	Ptransfer	float64
 
 }

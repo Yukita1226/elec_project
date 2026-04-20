@@ -16,6 +16,7 @@ var car = entity.Car{}
 
 func Makenum(){
 	solar.Ptotal = rand.Float64()* 100
+	solar.Ptransfer = rand.Float64()*10
 
 	ev.Ptotal = rand.Float64()* 100
 	ev.Ptransfer = rand.Float64()* 100

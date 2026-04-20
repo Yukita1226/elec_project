@@ -8,6 +8,7 @@ int main() {
     Solar s = api.getSolar();
 
     std::cout << "Ptotal = " << s.Ptotal << std::endl;
+    std::cout << "Ptransfer = " << s.Ptransfer << std::endl;
 
     return 0;
 }

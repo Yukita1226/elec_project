@@ -29,6 +29,7 @@ Solar Recivedata::getSolar() {
 
     js j = js::parse(res);
     s.Ptotal = j["Ptotal"].get<double>();
+    s.Ptransfer = j["Ptransfer"].get<double>();
 
     return s;
     
