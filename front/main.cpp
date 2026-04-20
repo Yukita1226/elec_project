@@ -1,6 +1,15 @@
 #include <iostream>
+#include "api/api.h"
 
 int main() {
-    std::cout << "test ok\n";
+
+    Recivedata api;
+
+    Solar s = api.getSolar();
+
+    std::cout << "Ptotal = " << s.Ptotal << std::endl;
+
     return 0;
 }
+
+//g++ main.cpp api/*.cpp -o app.exe

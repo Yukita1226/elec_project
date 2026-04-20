@@ -1,8 +1,11 @@
+#include "../struct/car.h"
+#include "../struct/solar.h"
+#include "../struct/evstation.h"
 #pragma once
 
 class Recivedata {
 public:
-    double getSolar();
-    double getCar();
-    double getEv();
+    Solar       getSolar();
+    Car         getCar();
+    Evstation   getEv();
 };
