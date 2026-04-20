@@ -3,8 +3,7 @@
     {
       "name": "Win32",
       "includePath": [
-        "${workspaceFolder}/**",
-        "${workspaceFolder}/front/curl/include"
+        "${workspaceFolder}/**"
       ],
       "compilerPath": "C:/msys64/ucrt64/bin/g++.exe",
       "cStandard": "c17",
