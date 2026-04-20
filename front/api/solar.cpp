@@ -6,7 +6,7 @@
 using js = nlohmann::json;
 Solar s;
 
-size_t Wcallb(void* contents, size_t size, size_t nmemb, std::string* s) {
+static size_t Wcallb(void* contents, size_t size, size_t nmemb, std::string* s) {
     s->append((char*)contents, size * nmemb);
     return size * nmemb;
 }

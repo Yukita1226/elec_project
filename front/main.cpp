@@ -5,7 +5,7 @@ int main() {
 
     Recivedata api;
 
-    Solar s = api.getSolar();
+    Car s = api.getCar();
 
     std::cout << "Ptotal = " << s.Ptotal << std::endl;
     std::cout << "Ptransfer = " << s.Ptransfer << std::endl;
