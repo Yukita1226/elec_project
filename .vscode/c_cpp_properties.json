@@ -3,7 +3,12 @@
     {
       "name": "Win32",
       "includePath": [
-        "${workspaceFolder}/**"
+        "${workspaceFolder}/front",
+        "${workspaceFolder}/front/lvgl",
+        "${workspaceFolder}/front/lvgl/src/**"
+      ],
+      "defines": [
+        "LV_CONF_INCLUDE_SIMPLE"
       ],
       "compilerPath": "C:/msys64/ucrt64/bin/g++.exe",
       "cStandard": "c17",
