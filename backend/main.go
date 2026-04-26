@@ -3,9 +3,7 @@ package main
 import (
 	//"sync"
 	"time"
-
 	"ev/controller"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,17 +11,31 @@ import (
 func main(){
 
 	r := gin.Default()
-	//var mu sync.Mutex
-
 
 	r.GET("/Getsolar",controller.Getsolar)
 	r.GET("/Getcar",controller.Getcar)
 	r.GET("/Getev",controller.Getev)
 
-	controller.Makenum()
+	controller.MakenumCar()
 	go func() {
 		for {
-			controller.Makenum()
+			controller.MakenumCar()
+			time.Sleep(5 * time.Second)
+		}
+	}()
+
+		controller.MakenumEv()
+	go func() {
+		for {
+			controller.MakenumEv()
+			time.Sleep(5 * time.Second)
+		}
+	}()
+
+		controller.MakenumSolar()
+	go func() {
+		for {
+			controller.MakenumSolar()
 			time.Sleep(5 * time.Second)
 		}
 	}()
