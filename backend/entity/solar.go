@@ -2,7 +2,7 @@ package entity
 
 type Solar struct {
 
-	Ptotal 		float64
-	Ptransfer	float64
+	Ptotal 		float64		`json:"ptotalS"`
+	Ptransfer	float64		`json:"ptotalS"`
 
 }

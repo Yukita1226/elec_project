@@ -2,7 +2,7 @@ package entity
 
 type Car struct {
 
-	Ptotal float64
-	Ptransfer float64
+	Ptotal	  float64	`json:"ptotalC"`
+	Ptransfer float64	`json:"PtransferC"`
 	
 }
