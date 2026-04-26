@@ -1,37 +1,81 @@
-#include <curl/curl.h>
+#include <libwebsockets.h>
 #include "json.hpp"
 #include "api.h"
-#include "../struct/solar.h"
+#include "../struct/car.h"
+#include <thread>
 
 using js = nlohmann::json;
-Car c;
 
-static size_t Wcallb(void* contents, size_t size, size_t nmemb, std::string* s) {
-    s->append((char*)contents, size * nmemb);
-    return size * nmemb;
-}
+static Car c;
+static bool g_ready = false;
 
-Car Recivedata::getCar() {
+static int ws_call(struct lws* wsi,enum lws_callback_reasons reason, void* user,void* in,size_t len)
+{
+    if (reason == LWS_CALLBACK_CLIENT_RECEIVE && in && len > 0)
+    {
+        try
+        {
+            {
+                auto j = js::parse((char*)in, (char*)in + len);
 
-    CURL* curl;
-    std::string res;
+                c.Ptotal      = j["ptotalC"];
+                c.Ptransfer   = j["ptransferC"];
 
-    curl  =curl_easy_init();
-
-    if (curl) {
-         curl_easy_setopt(curl, CURLOPT_URL, "http://localhost:8080/Getcar");
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, Wcallb);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &res);
-
-        curl_easy_perform(curl);
-        curl_easy_cleanup(curl);
+                g_ready = true;
+            }
+        } catch (...) {}
     }
+    return 0;
+      
+}
 
-    js j = js::parse(res);
-    c.Ptotal = j["Ptotal"].get<double>();
-    c.Ptransfer = j["Ptransfer"].get<double>();
+static lws_protocols protocols[] = 
+{
+    { "energy", ws_call, 0, 4096 },
+    { NULL, NULL, 0, 0 }
 
-    return c;
-    
+};
+
+static void ws_s()
+{
+
+    lws_context_creation_info info{};
+
+    info.port = CONTEXT_PORT_NO_LISTEN;
+    info.protocols = protocols;
+
+    lws_context* ctx = lws_create_context(&info);
+
+    lws_client_connect_info cc{};
+    cc.context = ctx;
+    cc.address = "127.0.0.1";
+    cc.port = 8080;
+    cc.path = "/Getcar";
+    cc.host = "127.0.0.1";
+    cc.protocol = protocols[0].name;
+
+    lws_client_connect_via_info(&cc);
+
+    std::thread([ctx]()
+    {
+
+        while(1) lws_service(ctx,50);
+
+    }).detach();
 
 }
+
+Car Recivedata::getCar()
+{
+    static bool s = false;
+
+    if(!s)
+    {
+
+        ws_s();
+        s = true;
+
+    }
+    return c;
+}
+
