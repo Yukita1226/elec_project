@@ -80,10 +80,11 @@ static void set_card_value(const CardWidgets & w,
 // ─────────────────────────────────────────────────────────────────────────────
 static void do_refresh(lv_timer_t * /*t*/ = nullptr)
 {
-    Recivedata api;
-    Solar  solar_data = api.getSolar();
-    Evstation ev_data = api.getEv();
-    Car    car_data   = api.getCar();
+    static Recivedata a;
+
+    Solar       solar_data  =   a.getSolar();
+    Evstation   ev_data     =   a.getEv();
+    Car         car_data    =   a.getCar();
  
     // Update cards
     set_card_value(w_solar, solar_data.Ptotal, solar_data.Ptransfer, CLR_CARD_SOLAR);
@@ -271,17 +272,7 @@ static void build_chart(lv_obj_t * parent,
         lv_chart_set_next_value(chart, ser_car,   0);
     }
 }
- 
-// ─────────────────────────────────────────────────────────────────────────────
-//  MANUAL REFRESH BUTTON  (also triggers the same do_refresh logic)
-// ─────────────────────────────────────────────────────────────────────────────
-static void refresh_btn_event_cb(lv_event_t * e)
-{
-    if (lv_event_get_code(e) == LV_EVENT_CLICKED) {
-        do_refresh();
-    }
-}
- 
+
 // ─────────────────────────────────────────────────────────────────────────────
 //  PAGE ENTRY POINT  — called by your page router
 // ─────────────────────────────────────────────────────────────────────────────
@@ -334,27 +325,12 @@ void create_page_t2()
  
     // ── Chart ───────────────────────────────────────────────────────────────
     const lv_coord_t CHART_Y = CARD_Y + CARD_H + 8;
-    const lv_coord_t CHART_H = LV_VER_RES - CHART_Y - 42;   // leave room for button
+    const lv_coord_t CHART_H = LV_VER_RES - CHART_Y - 10;   // leave room for button
     build_chart(scr, CARD_GAP, CHART_Y, LV_HOR_RES - CARD_GAP * 2, CHART_H);
  
-    // ── Refresh button ──────────────────────────────────────────────────────
-    lv_obj_t * btn = lv_btn_create(scr);
-    lv_obj_set_size(btn, 160, 32);
-    lv_obj_align(btn, LV_ALIGN_BOTTOM_MID, 0, -5);
-    lv_obj_set_style_bg_color(btn,    CLR_CARD_EV,  LV_PART_MAIN);
-    lv_obj_set_style_bg_color(btn,    lv_color_darken(CLR_CARD_EV, 40), LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_radius(btn,      6,            LV_PART_MAIN);
-    lv_obj_set_style_shadow_width(btn, 0,           LV_PART_MAIN);
-    lv_obj_add_event_cb(btn, refresh_btn_event_cb, LV_EVENT_CLICKED, NULL);
- 
-    lv_obj_t * btn_lbl = lv_label_create(btn);
-    lv_label_set_text(btn_lbl, LV_SYMBOL_REFRESH "  Refresh Now");
-    lv_obj_center(btn_lbl);
-    lv_obj_set_style_text_color(btn_lbl, CLR_BG, LV_PART_MAIN);
-    lv_obj_set_style_text_font(btn_lbl, &lv_font_montserrat_14, LV_PART_MAIN);
  
     // ── Auto-refresh timer (every 10 s) ─────────────────────────────────────
-    refresh_timer = lv_timer_create(do_refresh, 10000, nullptr);
+    refresh_timer = lv_timer_create(do_refresh, 1000, nullptr);
  
     // ── First load ──────────────────────────────────────────────────────────
     do_refresh();
