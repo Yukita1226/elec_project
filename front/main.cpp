@@ -27,8 +27,6 @@ int main(int argc, char* argv[]) {
     
     return 0;
 }
-//old one
-//g++ main.cpp api/*.cpp ui/t2/*.cpp -I. -I./lvgl -I./lvgl/src -I./lvgl/src/drivers/sdl -DLV_CONF_INCLUDE_SIMPLE -DLV_USE_SDL=1 -L. -o app.exe "-Wl,--start-group" liblvgl.a -lcurl -lSDL2 "-Wl,--end-group"
 
 //new one 
 //g++ main.cpp api/*.cpp ui/t2/*.cpp -I. -I./lvgl -I./lvgl/src -I./lvgl/src/drivers/sdl -DLV_CONF_INCLUDE_SIMPLE -DLV_USE_SDL=1 -L. -o app.exe "-Wl,--start-group" liblvgl.a -lSDL2 -lwebsockets -lws2_32 "-Wl,--end-group"

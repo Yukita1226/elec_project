@@ -15,8 +15,8 @@ func main(){
 	r.GET("/Getsolar",controller.Getsolar)
 	r.GET("/Getcar",controller.Getcar)
 	r.GET("/Getev",controller.Getev)
+	r.GET("/Getgrid",  controller.Getgrid)
 
-	controller.MakenumCar()
 	go func() {
 		for {
 			controller.MakenumCar()
@@ -24,7 +24,6 @@ func main(){
 		}
 	}()
 
-		controller.MakenumEv()
 	go func() {
 		for {
 			controller.MakenumEv()
@@ -32,13 +31,20 @@ func main(){
 		}
 	}()
 
-		controller.MakenumSolar()
 	go func() {
 		for {
 			controller.MakenumSolar()
 			time.Sleep(5 * time.Second)
 		}
 	}()
+
+	go func() {
+		for {
+		controller.Readmod()
+        time.Sleep(1 * time.Second)
+		}
+	}()
+
 	r.Run(":8080")
 	
 }
