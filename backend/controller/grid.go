@@ -11,6 +11,11 @@ import (
 
 var g = entity.Grid{}
 
+var (
+	maxCapacityAh   float32 = 50.0 
+	currentChargeAh float32 = 50.0 
+)
+
 func Readmod() {
 
 	ct, err := modbus.NewClient(&modbus.ClientConfiguration{
@@ -64,16 +69,36 @@ func Readmod() {
 	}
 }
 
+func MakeBatt() {
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	ahMoved := g.Amm * (1.0 / 3600.0)
+	currentChargeAh += ahMoved
+
+	if currentChargeAh > maxCapacityAh {
+		currentChargeAh = maxCapacityAh
+	} else if currentChargeAh < 0 {
+		currentChargeAh = 0
+	}
+
+	g.Batt = (currentChargeAh / maxCapacityAh) * 50
+}
+
 func Getgrid(ctx *gin.Context) {
 
 	c, err := upg.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
 		return
 	}
+	
 	defer c.Close()
 
 	for {
 
+		MakeBatt()
+		
 		mu.Lock()
 		err := c.WriteJSON(g)
 		mu.Unlock()
