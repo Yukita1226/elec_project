@@ -42,7 +42,6 @@ func Readmod() {
 	if err != nil {
 		fmt.Println("Voltage error:", err)
 	} else {
-		fmt.Println("Voltage:", v)
 		mu.Lock()
 		g.Voltage = v
 		mu.Unlock()
@@ -52,7 +51,7 @@ func Readmod() {
 	if err != nil {
 		fmt.Println("Amp error:", err)
 	} else {
-		fmt.Println("Amp:", am)
+
 		mu.Lock()
 		g.Amm = am
 		mu.Unlock()
@@ -62,7 +61,7 @@ func Readmod() {
 	if err != nil {
 		fmt.Println("Watt error:", err)
 	} else {
-		fmt.Println("Watt:", wt)
+
 		mu.Lock()
 		g.Watt = wt
 		mu.Unlock()

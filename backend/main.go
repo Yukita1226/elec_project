@@ -17,26 +17,6 @@ func main(){
 	r.GET("/Getev",controller.Getev)
 	r.GET("/Getgrid",  controller.Getgrid)
 
-	go func() {
-		for {
-			controller.MakenumCar()
-			time.Sleep(5 * time.Second)
-		}
-	}()
-
-	go func() {
-		for {
-			controller.MakenumEv()
-			time.Sleep(5 * time.Second)
-		}
-	}()
-
-	go func() {
-		for {
-			controller.MakenumSolar()
-			time.Sleep(5 * time.Second)
-		}
-	}()
 
 	go func() {
 		for {

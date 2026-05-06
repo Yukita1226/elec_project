@@ -2,7 +2,7 @@
 #include "lvgl/lvgl.h"
 #include "../../api/api.h"
 #include <string>
-#include <cstdio>   // snprintf
+#include <cstdio>
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  PALETTE
@@ -12,6 +12,7 @@
 #define CLR_CARD_SOLAR  lv_color_hex(0xFFB300)   // amber  – voltage
 #define CLR_CARD_EV     lv_color_hex(0x00BCD4)   // cyan   – current
 #define CLR_CARD_CAR    lv_color_hex(0x66BB6A)   // green  – watt
+#define CLR_CARD_BATT   lv_color_hex(0xAB47BC)   // purple – battery
 #define CLR_TEXT        lv_color_hex(0xE6EDF3)
 #define CLR_SUBTEXT     lv_color_hex(0x8B949E)
 #define CLR_DIVIDER     lv_color_hex(0x21262D)
@@ -26,6 +27,7 @@
 static lv_chart_series_t * ser_voltage = nullptr;
 static lv_chart_series_t * ser_amp     = nullptr;
 static lv_chart_series_t * ser_watt    = nullptr;
+static lv_chart_series_t * ser_batt    = nullptr;
 static lv_obj_t           * chart      = nullptr;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -38,7 +40,7 @@ struct CardWidgets {
     lv_obj_t * bar;
 };
 
-static CardWidgets w_voltage, w_amp, w_watt;
+static CardWidgets w_voltage, w_amp, w_watt, w_batt;
 static lv_obj_t  * lbl_last_update = nullptr;
 static lv_timer_t * refresh_timer  = nullptr;
 
@@ -80,14 +82,16 @@ static void do_refresh(lv_timer_t * /*t*/ = nullptr)
     Grid grid_data = a.getGrid();
 
     // Update cards
-    set_grid_value(w_voltage, grid_data.Voltage, "V",  300.0f, CLR_CARD_SOLAR);
-    set_grid_value(w_amp,     grid_data.Amm,     "A",  30.0f,  CLR_CARD_EV);
-    set_grid_value(w_watt,    grid_data.Watt,    "W",  10000.0f, CLR_CARD_CAR);
+    set_grid_value(w_voltage, grid_data.Voltage, "V",  300.0f,  CLR_CARD_SOLAR);
+    set_grid_value(w_amp,     grid_data.Amm,     "A",  30.0f,   CLR_CARD_EV);
+    set_grid_value(w_watt,    grid_data.Watt,    "W",  10000.0f,CLR_CARD_CAR);
+    set_grid_value(w_batt,    grid_data.Batt,    "%",  100.0f,  CLR_CARD_BATT);
 
     // Push chart points
     lv_chart_set_next_value(chart, ser_voltage, (lv_coord_t)(grid_data.Voltage));
     lv_chart_set_next_value(chart, ser_amp,     (lv_coord_t)(grid_data.Amm * 10));
     lv_chart_set_next_value(chart, ser_watt,    (lv_coord_t)(grid_data.Watt / 10));
+    lv_chart_set_next_value(chart, ser_batt,    (lv_coord_t)(grid_data.Batt * 10));
     lv_chart_refresh(chart);
 
     // Timestamp
@@ -216,18 +220,19 @@ static void build_chart(lv_obj_t * parent,
         { "Voltage", CLR_CARD_SOLAR, 0   },
         { "Amp",     CLR_CARD_EV,    80  },
         { "Watt",    CLR_CARD_CAR,   145 },
+        { "Batt",    CLR_CARD_BATT,  200 },
     };
     for (auto & l : legend) {
         lv_obj_t * d = lv_obj_create(cont);
         lv_obj_set_size(d, 8, 8);
-        lv_obj_set_pos(d, w - 170 + l.ox, 2);
+        lv_obj_set_pos(d, w - 230 + l.ox, 2);
         lv_obj_set_style_radius(d, LV_RADIUS_CIRCLE, LV_PART_MAIN);
         lv_obj_set_style_bg_color(d, l.color, LV_PART_MAIN);
         lv_obj_set_style_border_width(d, 0, LV_PART_MAIN);
 
         lv_obj_t * ld = lv_label_create(cont);
         lv_label_set_text(ld, l.name);
-        lv_obj_set_pos(ld, w - 158 + l.ox, 0);
+        lv_obj_set_pos(ld, w - 218 + l.ox, 0);
         lv_obj_set_style_text_color(ld, CLR_SUBTEXT, LV_PART_MAIN);
         lv_obj_set_style_text_font(ld, &lv_font_montserrat_10, LV_PART_MAIN);
     }
@@ -252,11 +257,13 @@ static void build_chart(lv_obj_t * parent,
     ser_voltage = lv_chart_add_series(chart, CLR_CARD_SOLAR, LV_CHART_AXIS_PRIMARY_Y);
     ser_amp     = lv_chart_add_series(chart, CLR_CARD_EV,    LV_CHART_AXIS_PRIMARY_Y);
     ser_watt    = lv_chart_add_series(chart, CLR_CARD_CAR,   LV_CHART_AXIS_PRIMARY_Y);
+    ser_batt    = lv_chart_add_series(chart, CLR_CARD_BATT,  LV_CHART_AXIS_PRIMARY_Y);
 
     for (int i = 0; i < CHART_POINTS; i++) {
         lv_chart_set_next_value(chart, ser_voltage, 0);
         lv_chart_set_next_value(chart, ser_amp,     0);
         lv_chart_set_next_value(chart, ser_watt,    0);
+        lv_chart_set_next_value(chart, ser_batt,    0);
     }
 }
 
@@ -296,15 +303,17 @@ void create_page_t2()
     // Card row
     const lv_coord_t CARD_Y   = 48;
     const lv_coord_t CARD_H   = 148;
-    const lv_coord_t CARD_W   = 142;
+    const lv_coord_t CARD_W   = 105;
     const lv_coord_t CARD_GAP = 6;
 
-    w_voltage = build_card(scr, "VOLTAGE", LV_SYMBOL_IMAGE,  CLR_CARD_SOLAR,
-                            CARD_GAP,                         CARD_Y, CARD_W, CARD_H);
-    w_amp     = build_card(scr, "CURRENT", LV_SYMBOL_CHARGE, CLR_CARD_EV,
-                            CARD_GAP + CARD_W + CARD_GAP,    CARD_Y, CARD_W, CARD_H);
-    w_watt    = build_card(scr, "WATT",    LV_SYMBOL_DRIVE,  CLR_CARD_CAR,
-                            CARD_GAP + (CARD_W + CARD_GAP) * 2, CARD_Y, CARD_W, CARD_H);
+    w_voltage = build_card(scr, "VOLTAGE", LV_SYMBOL_IMAGE,        CLR_CARD_SOLAR,
+                            CARD_GAP,                               CARD_Y, CARD_W, CARD_H);
+    w_amp     = build_card(scr, "CURRENT", LV_SYMBOL_CHARGE,       CLR_CARD_EV,
+                            CARD_GAP + CARD_W + CARD_GAP,          CARD_Y, CARD_W, CARD_H);
+    w_watt    = build_card(scr, "WATT",    LV_SYMBOL_DRIVE,        CLR_CARD_CAR,
+                            CARD_GAP + (CARD_W + CARD_GAP) * 2,   CARD_Y, CARD_W, CARD_H);
+    w_batt    = build_card(scr, "BATTERY", LV_SYMBOL_BATTERY_FULL, CLR_CARD_BATT,
+                            CARD_GAP + (CARD_W + CARD_GAP) * 3,   CARD_Y, CARD_W, CARD_H);
 
     // Chart
     const lv_coord_t CHART_Y = CARD_Y + CARD_H + 8;

@@ -18,6 +18,7 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
             g.Voltage = j["voltage_g"];
             g.Amm     = j["amm_g"];
             g.Watt    = j["watt_g"];
+            g.Batt    = j["batt"];
             g_ready = true;
         } catch (...) {}
     }
